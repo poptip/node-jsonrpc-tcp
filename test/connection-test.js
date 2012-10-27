@@ -28,6 +28,10 @@ MockSocket.prototype.connect = function() {
   process.nextTick(this.emit.bind(this, 'connect'));
 };
 
+MockSocket.prototype.end = function() {
+  process.nextTick(this.emit.bind(this, 'close'));
+};
+
 
 vows.describe('Connection').addBatch({
   
@@ -89,10 +93,7 @@ vows.describe('Connection').addBatch({
       connection.on('connect', function(remote) {
         self.callback(null, connection, remote);
       });
-      
-      process.nextTick(function () {
-        connection._socket.emit('connect');
-      });
+      connection.connect();
     },
     
     'should emit a remote' : function(err, connection, remote) {
@@ -400,6 +401,27 @@ vows.describe('Connection').addBatch({
     },
 
     'should reconnect after 5 seconds': function() {
+    }
+  },
+
+  'connnection can be end()ed': {
+    topic: function() {
+      var callback = this.callback;
+      var connection = new Connection(new MockSocket());
+      connection.reconnectTimeout = 1;
+      connection.connect();
+      connection.connect = function() {
+        throw new Error('should not be called again');
+      };
+
+      connection.on('connect', function() {
+        process.nextTick(function() {
+          connection.end(callback.bind(null, null));
+        });
+      });
+    },
+
+    'should not reconnected when end() is called': function() {
     }
   }
   
