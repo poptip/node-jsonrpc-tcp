@@ -2,7 +2,7 @@ var vows = require('vows');
 var assert = require('assert');
 var events = require('events');
 var util = require('util');
-var Remote = require('jsonrpc-tcp/remote');
+var Remote = require('../lib/remote');
 
 
 function MockConnection() {
@@ -52,7 +52,7 @@ vows.describe('Remote').addBatch({
     },
     
     'should call callback with error' : function(err, e, res) {
-      assert.ok(e instanceof Error);
+      assert.instanceOf(e, Error);
       assert.equal(e.message, 'Internal Server Error');
       assert.isNull(res);
     },

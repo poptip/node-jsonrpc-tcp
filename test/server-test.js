@@ -2,9 +2,9 @@ var vows = require('vows');
 var assert = require('assert');
 var events = require('events');
 var util = require('util');
-var Server = require('jsonrpc-tcp/server');
-var Connection = require('jsonrpc-tcp/connection');
-var Remote = require('jsonrpc-tcp/remote');
+var Server = require('../lib/server');
+var Connection = require('../lib/connection');
+var Remote = require('../lib/remote');
 
 
 function MockSocket() {

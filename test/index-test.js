@@ -1,6 +1,6 @@
 var vows = require('vows');
 var assert = require('assert');
-var jsonrpc = require('jsonrpc-tcp');
+var jsonrpc = require('..');
 var util = require('util');
 
 
