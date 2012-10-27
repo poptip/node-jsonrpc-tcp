@@ -1,7 +1,6 @@
 var vows = require('vows');
 var assert = require('assert');
 var jsonrpc = require('..');
-var util = require('util');
 
 
 vows.describe('Module').addBatch({
@@ -11,15 +10,15 @@ vows.describe('Module').addBatch({
       return null;
     },
     
-    'should report a version': function (x) {
+    'should report a version': function () {
       assert.isString(jsonrpc.version);
     },
-    'should export Server': function (x) {
+    'should export Server': function () {
       assert.isFunction(jsonrpc.Server);
     },
-    'should export Connection': function (x) {
+    'should export Connection': function () {
       assert.isFunction(jsonrpc.Connection);
-    },
+    }
   },
   
   'create server': {
@@ -29,7 +28,7 @@ vows.describe('Module').addBatch({
     
     'should be an instance of Server': function (server) {
       assert.instanceOf(server, jsonrpc.Server);
-    },
+    }
   },
   
   'create client': {
@@ -39,7 +38,7 @@ vows.describe('Module').addBatch({
     
     'should be an instance of Connection': function (client) {
       assert.instanceOf(client, jsonrpc.Connection);
-    },
-  },
+    }
+  }
   
 }).export(module);

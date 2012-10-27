@@ -11,8 +11,8 @@ function MockConnection() {
 
 util.inherits(MockConnection, events.EventEmitter);
 
-MockConnection.prototype.send = function(obj) {
-}
+MockConnection.prototype.send = function() {
+};
 
 
 vows.describe('Remote').addBatch({
@@ -24,7 +24,7 @@ vows.describe('Remote').addBatch({
       var remote = new Remote(connection);
       remote.call('echo', 'Hello JSON-RPC', function(err, res) {
         self.callback(null, err, res);
-      })
+      });
       
       process.nextTick(function () {
         connection.emit('response', { id: 1, result: 'Hello JSON-RPC', error: null });
@@ -34,7 +34,7 @@ vows.describe('Remote').addBatch({
     'should call callback with result' : function(err, e, res) {
       assert.equal(res, 'Hello JSON-RPC');
       assert.isNull(e);
-    },
+    }
   },
   
   'remote that receives an error response': {
@@ -44,7 +44,7 @@ vows.describe('Remote').addBatch({
       var remote = new Remote(connection);
       remote.call('echo', 'Hello JSON-RPC', function(err, res) {
         self.callback(null, err, res);
-      })
+      });
       
       process.nextTick(function () {
         connection.emit('response', { id: 1, result: null, error: 'Internal Server Error' });
@@ -55,7 +55,7 @@ vows.describe('Remote').addBatch({
       assert.instanceOf(e, Error);
       assert.equal(e.message, 'Internal Server Error');
       assert.isNull(res);
-    },
+    }
   },
   
   'remote that does not receive a response before timeout': {
@@ -66,7 +66,7 @@ vows.describe('Remote').addBatch({
       remote.timeout = 500;
       remote.call('echo', 'Hello JSON-RPC', function(err, res) {
         self.callback(null, err, res);
-      })
+      });
       
       // connection doesn't emit a response, causing an eventual timeout
     },
@@ -75,7 +75,7 @@ vows.describe('Remote').addBatch({
       assert.instanceOf(e, Error);
       assert.equal(e.message, 'Timed Out');
       assert.isUndefined(res);
-    },
-  },
+    }
+  }
 
 }).export(module);

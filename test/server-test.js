@@ -13,8 +13,8 @@ function MockSocket() {
 
 util.inherits(MockSocket, events.EventEmitter);
 
-MockSocket.prototype.setEncoding = function(encoding) {
-}
+MockSocket.prototype.setEncoding = function() {
+};
 
 
 vows.describe('Server').addBatch({
@@ -47,9 +47,9 @@ vows.describe('Server').addBatch({
       },
       'should expose services on connection' : function(err, connection, remote) {
         assert.lengthOf(Object.keys(connection._methods), 1);
-        assert.isFunction(connection._methods['noop']);
-      },
-    },
-  },
+        assert.isFunction(connection._methods.noop);
+      }
+    }
+  }
   
 }).export(module);

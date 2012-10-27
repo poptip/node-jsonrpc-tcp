@@ -15,14 +15,18 @@ util.inherits(MockSocket, events.EventEmitter);
 
 MockSocket.prototype.write = function(data) {
   this._buffer += data;
-}
+};
 
 MockSocket.prototype.destroy = function() {
   this._destroyed = true;
-}
+};
 
-MockSocket.prototype.setEncoding = function(encoding) {
-}
+MockSocket.prototype.setEncoding = function() {
+};
+
+MockSocket.prototype.connect = function() {
+  process.nextTick(this.emit.bind(this, 'connect'));
+};
 
 
 vows.describe('Connection').addBatch({
@@ -36,8 +40,8 @@ vows.describe('Connection').addBatch({
     
     'should expose service correctly' : function(err, connection) {
       assert.lengthOf(Object.keys(connection._methods), 1);
-      assert.isFunction(connection._methods['noop']);
-    },
+      assert.isFunction(connection._methods.noop);
+    }
   },
   
   'connection with an object exposed as a service': {
@@ -45,7 +49,7 @@ vows.describe('Connection').addBatch({
       var service = {
         add: function () {},
         subtract: function () {}
-      }
+      };
       
       var connection = new Connection();
       connection.expose('math', service);
@@ -56,7 +60,7 @@ vows.describe('Connection').addBatch({
       assert.lengthOf(Object.keys(connection._methods), 2);
       assert.isFunction(connection._methods['math.add']);
       assert.isFunction(connection._methods['math.subtract']);
-    },
+    }
   },
   
   'connection with an object exposed as a service without a module name': {
@@ -64,7 +68,7 @@ vows.describe('Connection').addBatch({
       var service = {
         ping: function () {},
         pong: function () {}
-      }
+      };
       
       var connection = new Connection();
       connection.expose(service);
@@ -73,9 +77,9 @@ vows.describe('Connection').addBatch({
     
     'should expose service correctly' : function(err, connection) {
       assert.lengthOf(Object.keys(connection._methods), 2);
-      assert.isFunction(connection._methods['ping']);
-      assert.isFunction(connection._methods['pong']);
-    },
+      assert.isFunction(connection._methods.ping);
+      assert.isFunction(connection._methods.pong);
+    }
   },
 
   'connection that connects': {
@@ -94,7 +98,7 @@ vows.describe('Connection').addBatch({
     'should emit a remote' : function(err, connection, remote) {
       assert.instanceOf(connection, Connection);
       assert.instanceOf(remote, Remote);
-    },
+    }
   },
   
   'connection that receives a request invoking a known method': {
@@ -116,7 +120,7 @@ vows.describe('Connection').addBatch({
     
     'should send a result response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '{"id":1,"result":"Hello JSON-RPC","error":null}');
-    },
+    }
   },
   
   'connection that receives a request invoking a known method with multiple parameters': {
@@ -138,7 +142,7 @@ vows.describe('Connection').addBatch({
     
     'should send a result response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '{"id":1,"result":5,"error":null}');
-    },
+    }
   },
   
   'connection that receives a request invoking a known method that encounters an error': {
@@ -160,7 +164,7 @@ vows.describe('Connection').addBatch({
     
     'should send an error response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '{"id":1,"result":null,"error":"something went wrong"}');
-    },
+    }
   },
   
   'connection that receives a request with id 0 invoking a known method': {
@@ -182,7 +186,7 @@ vows.describe('Connection').addBatch({
     
     'should send a result response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '{"id":0,"result":"Hello JSON-RPC","error":null}');
-    },
+    }
   },
   
   'connection that receives a request invoking an unknown method': {
@@ -202,7 +206,7 @@ vows.describe('Connection').addBatch({
     
     'should send an error response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '{"id":1,"result":null,"error":"Method Not Found"}');
-    },
+    }
   },
   
   'connection that receives a notification invoking a known method': {
@@ -224,7 +228,7 @@ vows.describe('Connection').addBatch({
     
     'should not send a response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '');
-    },
+    }
   },
   
   'connection that receives a notification invoking a known method that encounters an error': {
@@ -246,7 +250,7 @@ vows.describe('Connection').addBatch({
     
     'should not send a response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '');
-    },
+    }
   },
   
   'connection that receives a notification invoking an unknown method': {
@@ -264,7 +268,7 @@ vows.describe('Connection').addBatch({
     
     'should not send a response' : function(err, connection) {
       assert.equal(connection._socket._buffer, '');
-    },
+    }
   },
   
   'connection that receives a response': {
@@ -284,7 +288,7 @@ vows.describe('Connection').addBatch({
       assert.equal(res.id, 1);
       assert.equal(res.result, 'Hello JSON-RPC');
       assert.isNull(res.error);
-    },
+    }
   },
   
   'connection that receives an error response': {
@@ -303,8 +307,8 @@ vows.describe('Connection').addBatch({
     'should emit response' : function(err, connection, res) {
       assert.equal(res.id, 1);
       assert.isNull(res.result);
-      assert.equal(res.error, "Internal Server Error");
-    },
+      assert.equal(res.error, 'Internal Server Error');
+    }
   },
   
   'connection that receives a response with both result and error set to null': {
@@ -324,7 +328,7 @@ vows.describe('Connection').addBatch({
       assert.equal(res.id, 1);
       assert.isNull(res.result);
       assert.isNull(res.error);
-    },
+    }
   },
   
   'connection that receives invalid data': {
@@ -340,41 +344,63 @@ vows.describe('Connection').addBatch({
       });
     },
     
-    'should destroy socket' : function(err, connection, err) {
+    'should destroy socket' : function(err, connection) {
       assert.isTrue(connection._socket._destroyed);
     },
-    'should emit error' : function(err, connection, err) {
-      assert.isNotNull(err);
-    },
+    'should emit error' : function(err, connection, err2) {
+      assert.isNotNull(err2);
+    }
   },
   
   'connection that sends objects': {
     topic: function() {
       var connection = new Connection(new MockSocket());
-      connection.send({ result: "Hello JSON-RPC", error: null, id: 1});
+      connection.send({ result: 'Hello JSON-RPC', error: null, id: 1});
       return connection;
     },
     
     'should serialize objects as JSON strings' : function(err, connection) {
       assert.equal(connection._socket._buffer, '{"result":"Hello JSON-RPC","error":null,"id":1}');
-    },
+    }
   },
 
   'connection that calls RPC before it connects': {
     topic: function() {
       var callback = this.callback;
       var connection = new Connection(new MockSocket());
+      connection.connect();
       connection.call('hello', 'there', callback);
 
       process.nextTick(function () {
-        connection._socket.emit('connect');
         connection.emit('response', { id: 1, result: 'sup', error: null });
       });
     },
 
     'should call the callback with results': function(err, results) {
       assert.equal(results, 'sup');
-    },
+    }
   },
+
+  'connection that reconnects': {
+    topic: function() {
+      var callback = this.callback;
+      var connection = new Connection(new MockSocket());
+      connection.reconnectTimeout = 1;
+      connection.connect();
+
+      connection.once('connect', function() {
+        process.nextTick(function() {
+          connection._socket.emit('close');
+        });
+
+        connection.once('connect', function() {
+          callback(null);
+        });
+      });
+    },
+
+    'should reconnect after 5 seconds': function() {
+    }
+  }
   
 }).export(module);
