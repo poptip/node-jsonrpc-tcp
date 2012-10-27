@@ -359,5 +359,22 @@ vows.describe('Connection').addBatch({
       assert.equal(connection._socket._buffer, '{"result":"Hello JSON-RPC","error":null,"id":1}');
     },
   },
+
+  'connection that calls RPC before it connects': {
+    topic: function() {
+      var callback = this.callback;
+      var connection = new Connection(new MockSocket());
+      connection.call('hello', 'there', callback);
+
+      process.nextTick(function () {
+        connection._socket.emit('connect');
+        connection.emit('response', { id: 1, result: 'sup', error: null });
+      });
+    },
+
+    'should call the callback with results': function(err, results) {
+      assert.equal(results, 'sup');
+    },
+  },
   
 }).export(module);
