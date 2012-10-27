@@ -52,7 +52,8 @@ vows.describe('Remote').addBatch({
     },
     
     'should call callback with error' : function(err, e, res) {
-      assert.equal(e, 'Internal Server Error');
+      assert.ok(e instanceof Error);
+      assert.equal(e.message, 'Internal Server Error');
       assert.isNull(res);
     },
   },
