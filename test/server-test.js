@@ -30,24 +30,18 @@ vows.describe('Server').addBatch({
     'when accepting a connection': {
       topic: function(server) {
         var self = this;
-        server.on('client', function(connection, remote) {
-          self.callback(null, connection, remote);
+        server.on('connection', function(connection) {
+          self.callback(null, connection);
         });
         
         process.nextTick(function () {
           var socket = new MockSocket();
           server.emit('connection', socket);
-          socket.emit('connect');
         });
       },
       
-      'should emit a connection and a remote' : function(err, connection, remote) {
-        assert.instanceOf(connection, Connection);
-        assert.instanceOf(remote, Remote);
-      },
-      'should expose services on connection' : function(err, connection, remote) {
-        assert.lengthOf(Object.keys(connection._methods), 1);
-        assert.isFunction(connection._methods.noop);
+      'should emit a connection' : function(err, connection) {
+        assert.instanceOf(connection, MockSocket);
       }
     }
   }
