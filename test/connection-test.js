@@ -387,12 +387,23 @@ vows.describe('Connection').addBatch({
       var callback = this.callback;
       var connection = new Connection(new MockSocket());
       connection.reconnectTimeout = 1;
-      connection.connect();
+      connection.connect(3000, 'localhost');
 
       connection.once('connect', function() {
         process.nextTick(function() {
           connection._socket.emit('close');
         });
+
+        connection.connect = function(port, host, callback) {
+          if (port !== 3000) {
+            throw new Error('incorrect port: ' + port);
+          }
+          if (host !== 'localhost') {
+            throw new Error('incorrect host:' + host);
+          }
+
+          process.nextTick(this.emit.bind(this, 'connect'));
+        };
 
         connection.once('connect', function() {
           callback(null);
