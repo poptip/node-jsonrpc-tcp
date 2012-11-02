@@ -7,6 +7,7 @@ var Remote = require('../lib/remote');
 
 function MockConnection() {
   events.EventEmitter.call(this);
+  this.connected = true;
 }
 
 util.inherits(MockConnection, events.EventEmitter);
