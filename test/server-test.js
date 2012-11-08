@@ -13,8 +13,8 @@ function MockSocket() {
 
 util.inherits(MockSocket, events.EventEmitter);
 
-MockSocket.prototype.setEncoding = function() {
-};
+MockSocket.prototype.setEncoding = function() {};
+MockSocket.prototype.setKeepAlive = function() {};
 
 
 vows.describe('Server').addBatch({

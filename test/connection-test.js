@@ -21,8 +21,7 @@ MockSocket.prototype.destroy = function() {
   this._destroyed = true;
 };
 
-MockSocket.prototype.setEncoding = function() {
-};
+MockSocket.prototype.setEncoding = function() {};
 
 MockSocket.prototype.connect = function() {
   process.nextTick(this.emit.bind(this, 'connect'));
@@ -31,6 +30,8 @@ MockSocket.prototype.connect = function() {
 MockSocket.prototype.end = function() {
   process.nextTick(this.emit.bind(this, 'close'));
 };
+
+MockSocket.prototype.setKeepAlive = function() {};
 
 
 vows.describe('Connection').addBatch({
