@@ -58,25 +58,5 @@ vows.describe('Remote').addBatch({
       assert.isNull(res);
     }
   },
-  
-  'remote that does not receive a response before timeout': {
-    topic: function() {
-      var self = this;
-      var connection = new MockConnection();
-      var remote = new Remote(connection);
-      remote.timeout = 500;
-      remote.call('echo', 'Hello JSON-RPC', function(err, res) {
-        self.callback(null, err, res);
-      });
-      
-      // connection doesn't emit a response, causing an eventual timeout
-    },
-    
-    'should call callback with error' : function(err, e, res) {
-      assert.instanceOf(e, Error);
-      assert.equal(e.message, 'Timed Out');
-      assert.isUndefined(res);
-    }
-  }
 
 }).export(module);
