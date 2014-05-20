@@ -9,10 +9,6 @@ vows.describe('Module').addBatch({
     topic: function() {
       return null;
     },
-    
-    'should report a version': function () {
-      assert.isString(jsonrpc.version);
-    },
     'should export Server': function () {
       assert.isFunction(jsonrpc.Server);
     },
